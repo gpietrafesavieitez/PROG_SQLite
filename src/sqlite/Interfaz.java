@@ -5,20 +5,19 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 
-public class Interfaz extends javax.swing.JFrame {
-    
+public class Interfaz extends javax.swing.JFrame{
     SQLite bd;
     ResultSet rs;
     
     public Interfaz(){
-        bd = new SQLite();
+        bd = new SQLite("base.db", "alumnos");
         if(bd.conectar()){
             System.out.println("[ info ] Conexión satisfactoria.");
             rs = bd.mostrar();
             initComponents();
         }else{
             JOptionPane.showMessageDialog(null, "Error de conexión.", "SQLite", 0);
-            System.out.println("[ error ] No se ha podido establecer una conexión con la base de datos.");
+            System.out.println("[ error ] No se ha podido conectar con la DB.");
             System.exit(0);
         }
     }
@@ -153,72 +152,69 @@ public class Interfaz extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    // ELIMINAR
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         try{
             Object o = jTable1.getValueAt(jTable1.getSelectedRow(), 0);
-            int op = JOptionPane.showConfirmDialog(null,"¿Está seguro/a?","SQLite",JOptionPane.YES_NO_OPTION);
+            int op = JOptionPane.showConfirmDialog(null, "¿Está seguro/a?", "SQLite", JOptionPane.YES_NO_OPTION);
             if(op == 0){
                 int f = bd.eliminar(o);
                 if(f > 0){
-                    JOptionPane.showMessageDialog(null,"Entrada eliminada satisfactoriamente.","SQLite",1);
+                    JOptionPane.showMessageDialog(null, "Operación realizada satisfactoriamente.", "SQLite", 1);
                     System.out.println("[ info ] " + f + " fila(s) afectada(s)");
                 }else{
-                    JOptionPane.showMessageDialog(null,"No se ha podido eliminar.","SQLite",0);
-                    System.out.println("[ error ] No se ha podido borrar.");
+                    JOptionPane.showMessageDialog(null, "Ha habido un problema en la operación.", "SQLite", 0);
+                    System.out.println("[ error ] La entrada no se ha podido eliminar.");
                 }
                 refrescarTabla();
             }
-        }catch(ArrayIndexOutOfBoundsException e1){
-            JOptionPane.showMessageDialog(null,"Seleccione la entrada que desea eliminar.","SQLite",2);
-            System.out.println("[ error ] " + e1.getMessage());
+        }catch(ArrayIndexOutOfBoundsException aioobe){
+            JOptionPane.showMessageDialog(null, "Seleccione la entrada que desea eliminar.", "SQLite", 2);
+            System.out.println("[ aviso ] " + aioobe.getMessage());
         }
     }//GEN-LAST:event_jButton3ActionPerformed
-
+    // MODIFICAR
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try{
             int f = bd.modificar(jTable1.getValueAt(jTable1.getSelectedRow(), 0), jTable1.getValueAt(jTable1.getSelectedRow(), 1), jTable1.getValueAt(jTable1.getSelectedRow(), 2));
             if(f > 0){
-                JOptionPane.showMessageDialog(null,"Entrada modificada satisfactoriamente.","SQLite",1);
+                JOptionPane.showMessageDialog(null, "Operación realizada satisfactoriamente.", "SQLite", 1);
                 System.out.println("[ info ] " + f + " fila(s) afectada(s)");
             }else{
-                JOptionPane.showMessageDialog(null,"No se ha podido modificar.","SQLite",0);
-                System.out.println("[ error ] No se ha podido modificar.");
+                JOptionPane.showMessageDialog(null, "Ha habido un problema en la operación.", "SQLite", 0);
+                System.out.println("[ error ] La entrada no se ha podido modificar.");
             }
             refrescarTabla();
-        }catch(ArrayIndexOutOfBoundsException e1){
-            JOptionPane.showMessageDialog(null,"Seleccione la entrada que desea modificar.","SQLite",2);
-            System.out.println("[ error ] " + e1.getMessage());
+        }catch(ArrayIndexOutOfBoundsException aioobe){
+            JOptionPane.showMessageDialog(null, "Seleccione la entrada que desea modificar.", "SQLite", 2);
+            System.out.println("[ aviso ] " + aioobe.getMessage());
         }
     }//GEN-LAST:event_jButton2ActionPerformed
-
+    // INSERTAR
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try{
-            int id = Integer.parseInt(JOptionPane.showInputDialog(null,"Introduzca el ID:","SQLite",3));
-            String nombre = JOptionPane.showInputDialog(null,"Introduzca el nombre:","SQLite",3);
-            String apellido = JOptionPane.showInputDialog(null,"Introduzca el apellido:");
-            int f = bd.insertar(id,nombre,apellido);
-            if(f > 0){
-                JOptionPane.showMessageDialog(null,"Entrada insertada satisfactoriamente.","SQLite",1);
-                System.out.println("[ info ] " + f + " fila(s) afectada(s)");
-                refrescarTabla();
-            }else{
-                JOptionPane.showMessageDialog(null,"No se ha podido crear una entrada nueva.","SQLite",0);
-                System.out.println("[ error ] No se ha podido insertar.");
+        String nombre = JOptionPane.showInputDialog(null, "Introduzca el nombre:", "SQLite", 3);
+        if(nombre != null){
+            String apellido = JOptionPane.showInputDialog(null, "Introduzca el apellido:", "SQLite", 3);
+            if(apellido != null){
+                int f = bd.insertar(nombre, apellido);
+                if(f > 0){
+                    JOptionPane.showMessageDialog(null, "Operación realizada satisfactoriamente.", "SQLite", 1);
+                    System.out.println("[ info ] " + f + " fila(s) afectada(s)");
+                    refrescarTabla();
+                }else{
+                    JOptionPane.showMessageDialog(null, "Ha habido un problema en la operación.", "SQLite", 0);
+                    System.out.println("[ error ] La entrada no se ha podido insertar.");
+                }
             }
-        }catch(NumberFormatException e1){
-            JOptionPane.showMessageDialog(null,"Formato incorrecto.","SQLite",2);
-            System.out.println("[ error ] " + e1.getMessage());
-        }catch(Exception e){
-            System.out.println("[ error ] " + e.getMessage());
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    // SALIR
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         if(bd.desconectar()){
             System.out.println("[ info ] Desconexión satisfactoria.");
         }else{
-            System.out.println("[ error ] Ha habido problemas en la desconexión.");
+            JOptionPane.showMessageDialog(null, "Error de desconexión.", "SQLite", 0);
+            System.out.println("[ error ] No se ha podido desconectar.");
         }
         System.exit(0);
     }//GEN-LAST:event_jButton4ActionPerformed
